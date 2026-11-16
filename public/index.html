@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Список задач по дням: календарь, категории, отложенные и выполненные.">
+<title>Список задач</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<section id="auth" class="auth" hidden>
+  <form id="auth-form" class="auth__card" novalidate>
+    <p class="eyebrow">Список задач</p>
+    <h1 id="auth-title" class="auth__title">Вход</h1>
+    <p id="auth-hint" class="auth__hint">Войдите, чтобы открыть свои задачи.</p>
+
+    <label class="field">
+      <span class="field__label">Логин</span>
+      <input id="auth-login" type="text" autocomplete="username" required>
+    </label>
+
+    <label class="field">
+      <span class="field__label">Пароль</span>
+      <input id="auth-pass" type="password" autocomplete="current-password" required>
+    </label>
+
+    <p id="auth-error" class="auth__error" role="alert"></p>
+    <button class="btn btn--block" type="submit" id="auth-submit">Войти</button>
+    <p class="auth__switch">
+      <button id="auth-mode" class="link" type="button">Зарегистрироваться</button>
+    </p>
+  </form>
+</section>
+
+<main id="app" class="app" hidden>
+  <header class="topbar">
+    <p class="topbar__brand">Список задач</p>
+    <div class="topbar__side">
+      <span id="who" class="topbar__who"></span>
+      <button id="logout" class="link" type="button"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 12H4"/><path d="M8 8l-4 4 4 4"/><path d="M14 4h5v16h-5"/></svg>Выйти</button>
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside class="panel panel--cal">
+      <div class="cal__head">
+        <button id="prev" class="ghost" type="button" aria-label="Предыдущий месяц"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
+        <h2 id="month" class="cal__month"></h2>
+        <button id="next" class="ghost" type="button" aria-label="Следующий месяц"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>
+      </div>
+      <div class="cal__week" aria-hidden="true">
+        <span>пн</span><span>вт</span><span>ср</span><span>чт</span><span>пт</span><span>сб</span><span>вс</span>
+      </div>
+      <div id="grid" class="cal__grid"></div>
+      <button id="today" class="link" type="button">К сегодняшнему дню</button>
+    </aside>
+
+    <section class="panel">
+      <div class="head">
+        <div>
+          <h1 id="day-title" class="head__title"></h1>
+          <p id="day-stats" class="head__stats" role="status" aria-live="polite"></p>
+        </div>
+      </div>
+
+      <div class="progress"><i id="bar"></i></div>
+
+      <form id="form" class="form">
+        <input id="text" class="form__input" type="text" placeholder="Что нужно сделать?" maxlength="200" autocomplete="off" aria-label="Новая задача">
+        <div class="pick">
+<select id="cat" class="form__select pick__native" aria-label="Категория" tabindex="-1"></select>
+<button id="pick-btn" class="pick__btn" type="button" aria-haspopup="listbox" aria-expanded="false"></button>
+<ul id="pick-list" class="pick__list" role="listbox" hidden></ul>
+</div>
+        <button class="btn" type="submit"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Добавить</button>
+        <label class="later"><input id="later" type="checkbox"><span>Отложить без срока</span></label>
+      </form>
+
+      <nav class="tabs" role="tablist">
+        <button type="button" class="tab is-active" data-tab="day" role="tab" aria-selected="true"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10"/></svg>К выполнению</button>
+        <button type="button" class="tab" data-tab="done" role="tab" aria-selected="false"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 13l4 4 10-10"/></svg>Выполненные <b id="done-n">0</b></button>
+        <button type="button" class="tab" data-tab="later" role="tab" aria-selected="false"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.4"/><path d="M12 7.6v4.8l3.2 1.9"/></svg>Отложенные <b id="later-n">0</b></button>
+      </nav>
+
+      <div id="chips" class="chips" role="group" aria-label="Фильтр по категории"></div>
+
+      <ul id="list" class="list"></ul>
+      <p id="empty" class="empty" hidden></p>
+    </section>
+  </div>
+</main>
+
+<div id="toast" class="toast" hidden>
+  <span id="toast-text"></span>
+  <button id="toast-undo" class="toast__btn" type="button">Отменить</button>
+</div>
+
+<script src="app.js" defer></script>
+</body>
+</html>
