@@ -576,6 +576,7 @@ async function toggleDone(id, checked, item) {
     if (box) box.checked = value;
     updateStats();
   syncSelectedCell();
+  syncSelectedCell();
   };
 
   apply(checked);
@@ -595,7 +596,27 @@ async function toggleDone(id, checked, item) {
       if (item.isConnected) item.remove();
       updateStats();
   syncSelectedCell();
+  syncSelectedCell();
     }, 240);
+  }
+}
+
+function syncSelectedCell() {
+  const cell = document.querySelector('.day--sel');
+  if (!cell) return;
+  const dayItems = todos.filter((t) => t.date === selected);
+  const doneCount = dayItems.filter((t) => t.done).length;
+  let small = cell.querySelector('.day__c');
+  if (dayItems.length) {
+    if (!small) {
+      small = document.createElement('small');
+      small.className = 'day__c';
+      cell.append(small);
+    }
+    small.textContent = doneCount + '/' + dayItems.length;
+    cell.classList.toggle('day--done', doneCount === dayItems.length);
+  } else if (small) {
+    small.remove();
   }
 }
 
